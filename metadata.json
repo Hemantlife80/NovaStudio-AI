@@ -1,0 +1,5 @@
+{
+  "name": "NovaShoot AI",
+  "description": "An AI-powered photoshoot studio that automatically blends a product into a model's photo based on your creative direction. Upload images, provide a prompt, and generate professional-quality visuals in seconds.",
+  "requestFramePermissions": []
+}
