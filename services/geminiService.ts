@@ -70,7 +70,8 @@ export const generatePhotoshootImage = async (
         };
 
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
+            // यह सही लाइन है 👍
+model: 'gemini-1.5-flash-latest',
             contents: {
                 parts: [modelImagePart, productImagePart, textPart],
             },
