@@ -2,7 +2,8 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { StylePreset, AspectRatio } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+// यह सही लाइन लिखें 👍
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
