@@ -1,8 +1,27 @@
-// यह पूरा का पूरा सही कोड है
+// यह अंतिम और सही कोड है
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { StylePreset, AspectRatio } from '../types';
 
-const ai = new GoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
+// New: Initialize AI with Service Account JSON
+let ai: GoogleGenerativeAI;
+try {
+  const credentialsString = import.meta.env.VITE_GOOGLE_CREDENTIALS;
+  if (!credentialsString) {
+    throw new Error("VITE_GOOGLE_CREDENTIALS environment variable not set.");
+  }
+  const credentials = JSON.parse(credentialsString);
+  ai = new GoogleGenerativeAI({
+    credentials,
+    // Note: We don't pass the API key directly anymore
+  });
+} catch (e) {
+  console.error("Failed to initialize GoogleGenerativeAI:", e);
+  // Fallback to API key if service account fails, just in case
+  ai = new GoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
+}
+
+
+// --- The rest of the file is the same as before ---
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
