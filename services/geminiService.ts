@@ -53,7 +53,7 @@ export const generatePhotoshootImage = async (
   aspectRatio: AspectRatio
 ): Promise<string> => {
     try {
-        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const model = ai.getGenerativeModel({ model: "gemini-2.5-flash-image" });
 
         const modelImagePart = typeof modelImage === 'string'
             ? await urlToGenerativePart(modelImage)
