@@ -1,9 +1,8 @@
-
-// यह नई लाइन है 👍
+// यह पूरा का पूरा सही कोड है
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { StylePreset, AspectRatio } from '../types';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+const ai = new GoogleGenerativeAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY as string });
 
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -46,7 +45,6 @@ const fileToGenerativePart = async (file: File) => {
     };
 };
 
-
 export const generatePhotoshootImage = async (
   modelImage: File | string,
   productImage: File,
@@ -55,9 +53,11 @@ export const generatePhotoshootImage = async (
   aspectRatio: AspectRatio
 ): Promise<string> => {
     try {
+        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+
         const modelImagePart = typeof modelImage === 'string'
             ? await urlToGenerativePart(modelImage)
-            : await fileToGenerativePart(modelImage);
+            : await fileToGenerativePart(productImage);
 
         const productImagePart = await fileToGenerativePart(productImage);
 
@@ -69,24 +69,20 @@ export const generatePhotoshootImage = async (
             Ensure the lighting, shadows, and perspective on the integrated product are photorealistic and match the model's environment perfectly.`
         };
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: {
-                parts: [modelImagePart, productImagePart, textPart],
-            },
-            config: {
-                responseModalities: [Modality.IMAGE, Modality.TEXT],
-            },
+        const result = await model.generateContent({
+            contents: [{ parts: [modelImagePart, productImagePart, textPart] }],
         });
         
-        for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) {
-                const base64ImageBytes: string = part.inlineData.data;
-                const mimeType = part.inlineData.mimeType;
-                return `data:${mimeType};base64,${base64ImageBytes}`;
-            }
+        const response = result.response;
+        const responsePart = response.candidates?.[0]?.content?.parts?.[0];
+
+        if (responsePart && 'inlineData' in responsePart && responsePart.inlineData) {
+            const base64ImageBytes: string = responsePart.inlineData.data;
+            const mimeType = responsePart.inlineData.mimeType;
+            return `data:${mimeType};base64,${base64ImageBytes}`;
         }
-        throw new Error("No image was generated. Please try a different prompt or images.");
+        
+        throw new Error("No image was generated. Please check the response format.");
 
     } catch (error) {
         console.error("Error generating image with Gemini:", error);
